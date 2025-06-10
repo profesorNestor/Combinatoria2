@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.5, maximum-scale=3.0">
     <meta name="theme-color" content="#0f0c29">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,6 +23,30 @@
             padding: 10px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar personalizado ultra moderno */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 12, 41, 0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 0 15px rgba(240, 147, 251, 0.5);
         }
 
         .container {
@@ -218,12 +242,99 @@
             backdrop-filter: blur(10px);
         }
 
+        /* Contenedor de scroll sofisticado para mostrar TODOS los resultados */
+        .results-scroll-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(15, 12, 41, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            position: relative;
+        }
+
+        .results-scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results-scroll-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .results-scroll-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .results-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 0 10px rgba(240, 147, 251, 0.6);
+        }
+
+        /* Efecto de desvanecimiento en scroll */
+        .results-scroll-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(180deg, rgba(240, 147, 251, 0.15) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .results-scroll-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(0deg, rgba(240, 147, 251, 0.15) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .scroll-content {
+            position: relative;
+            z-index: 0;
+        }
+
+        /* Indicador de scroll */
+        .scroll-indicator {
+            text-align: center;
+            color: #4facfe;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+            font-weight: 600;
+        }
+
+        .scroll-stats {
+            background: rgba(79, 172, 254, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #4facfe;
+            font-weight: 600;
+            border: 1px solid rgba(79, 172, 254, 0.3);
+        }
+
         .element-container {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
             justify-content: center;
             margin: 16px 0;
+            padding: 0 5px;
         }
 
         .element {
@@ -231,31 +342,70 @@
             padding: 10px 14px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 25px;
-            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
             animation: fadeIn 0.5s ease-in;
             border: 2px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             color: white;
             font-weight: 600;
-            min-width: 44px;
+            min-width: 40px;
             text-align: center;
             transition: all 0.3s ease;
+            margin: 2px;
         }
 
         .element:hover {
             transform: scale(1.05);
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
 
         .selected-element {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
-            transform: scale(1.1);
-            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
-            animation: glow 2s infinite alternate;
+            box-shadow: 0 6px 15px rgba(240, 147, 251, 0.4);
+            animation: gentleGlow 3s infinite alternate;
         }
 
-        @keyframes glow {
-            from { box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4); }
-            to { box-shadow: 0 8px 20px rgba(240, 147, 251, 0.8); }
+        .combination-row {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 12px;
+            border-left: 3px solid #4facfe;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .combination-row:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+            border-left-color: #f093fb;
+        }
+
+        .combination-number {
+            color: #4facfe;
+            font-weight: 700;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        @keyframes gentleGlow {
+            from { box-shadow: 0 6px 15px rgba(240, 147, 251, 0.4); }
+            to { box-shadow: 0 6px 20px rgba(240, 147, 251, 0.7); }
+        }
+
+        @keyframes slideInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .combination-row {
+            animation: slideInUp 0.4s ease-out forwards;
         }
 
         .result-highlight {
@@ -330,9 +480,9 @@
             }
             
             .element {
-                font-size: 1rem;
+                font-size: 0.9rem;
                 padding: 8px 12px;
-                min-width: 40px;
+                min-width: 36px;
             }
             
             .calculate-btn {
@@ -348,6 +498,10 @@
             .results-section {
                 padding: 16px;
             }
+
+            .results-scroll-container {
+                max-height: 300px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -356,9 +510,9 @@
             }
             
             .element {
-                font-size: 0.9rem;
+                font-size: 0.8rem;
                 padding: 6px 10px;
-                min-width: 36px;
+                min-width: 32px;
             }
             
             .control-group select,
@@ -366,6 +520,54 @@
                 padding: 14px;
                 font-size: 16px; /* Prevent zoom on iOS */
             }
+
+            .results-scroll-container {
+                max-height: 250px;
+                padding: 15px;
+            }
+
+            .combination-row {
+                padding: 6px 10px;
+                margin: 2px 0;
+            }
+        }
+
+        /* Smooth scrolling para toda la aplicación */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Efectos de scroll avanzados */
+        .results-scroll-container {
+            scrollbar-width: thin;
+            scrollbar-color: #4facfe rgba(0,0,0,0.1);
+        }
+
+        /* Animaciones para elementos que aparecen en scroll */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .combination-row {
+            animation: fadeInScale 0.4s ease-out forwards;
+        }
+
+        /* Efectos de hover mejorados para elementos */
+        .element:active {
+            transform: scale(0.95);
+            transition: transform 0.1s ease;
+        }
+
+        .combination-row:active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(0.98);
         }
 
         /* Optimizaciones para iOS */
@@ -380,23 +582,23 @@
                 -webkit-tap-highlight-color: transparent;
                 -webkit-user-select: none;
             }
-        }
 
-        /* Modo oscuro nativo */
-        @media (prefers-color-scheme: dark) {
-            .control-group select,
-            .control-group input {
-                background: rgba(255, 255, 255, 0.9);
-                color: #1a202c;
+            .results-scroll-container {
+                -webkit-overflow-scrolling: touch;
             }
         }
 
-        /* Animaciones de alta performance */
-        .element,
-        .control-group,
-        .calculate-btn {
-            will-change: transform;
-            transform: translateZ(0);
+        /* Optimizaciones para Android */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .results-scroll-container {
+                max-height: 40vh;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            .results-scroll-container {
+                max-height: 30vh;
+            }
         }
     </style>
 </head>
@@ -478,7 +680,7 @@
             return result;
         }
 
-        // Función para generar combinaciones/permutaciones visualmente
+        // Función para generar combinaciones/permutaciones visualmente (TODAS)
         function generateVisualElements(n, r, type, elementType) {
             const elements = elementSets[elementType].slice(0, n);
             let combinations = [];
@@ -494,7 +696,7 @@
             return { elements, combinations };
         }
 
-        // Generar combinaciones
+        // Generar combinaciones (TODAS, sin límite)
         function getCombinations(arr, r) {
             const result = [];
             
@@ -512,10 +714,10 @@
             }
             
             backtrack(0, []);
-            return result.slice(0, 20); // Limitar para visualización
+            return result; // Sin límite
         }
 
-        // Generar permutaciones
+        // Generar permutaciones (TODAS, sin límite)
         function getPermutations(arr, r) {
             const result = [];
             
@@ -537,18 +739,21 @@
             }
             
             backtrack([], new Array(arr.length).fill(false));
-            return result.slice(0, 20); // Limitar para visualización
+            return result; // Sin límite
         }
 
-        // Generar variaciones con repetición
+        // Generar variaciones con repetición (TODAS, pero con límite inteligente)
         function getVariationsWithRepetition(arr, r) {
             const result = [];
+            const maxResults = 1000; // Límite inteligente para evitar crash del navegador
             
             function backtrack(path) {
                 if (path.length === r) {
                     result.push([...path]);
                     return;
                 }
+                
+                if (result.length >= maxResults) return; // Prevenir overflow
                 
                 for (let i = 0; i < arr.length; i++) {
                     path.push(arr[i]);
@@ -558,7 +763,79 @@
             }
             
             backtrack([]);
-            return result.slice(0, 20); // Limitar para visualización
+            return result;
+        }
+
+        // Función para crear el scroll sofisticado de resultados
+        function createResultsScroll(combinations, title, total) {
+            if (!combinations || combinations.length === 0) {
+                return `<p><em>No se pueden mostrar ejemplos para estos parámetros</em></p>`;
+            }
+
+            const showing = Math.min(combinations.length, 1000);
+            const hasMore = combinations.length > 1000;
+            
+            let scrollContent = `
+                <h3>${title}</h3>
+                <div class="scroll-stats">
+                    📊 Mostrando ${showing.toLocaleString()} de ${total.toLocaleString()} ${hasMore ? '(primeros 1000 para rendimiento)' : 'resultados'}
+                </div>
+                ${showing > 10 ? '<div class="scroll-indicator">📜 Desplázate para ver todos los resultados</div>' : ''}
+                <div class="results-scroll-container">
+                    <div class="scroll-content">
+            `;
+
+            // Mostrar todos los resultados en el scroll
+            combinations.slice(0, 1000).forEach((combo, index) => {
+                const delay = Math.min(index * 0.05, 2); // Animación escalonada
+                scrollContent += `
+                    <div class="combination-row" style="animation-delay: ${delay}s">
+                        <span class="combination-number">#${(index + 1).toString().padStart(3, '0')}</span>
+                        <div class="element-container" style="justify-content: flex-start; margin: 5px 0;">
+                            ${combo.map(el => `<span class="element selected-element">${el}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            scrollContent += `
+                    </div>
+                </div>
+            `;
+
+            if (hasMore) {
+                scrollContent += `
+                    <div style="text-align: center; margin-top: 10px; color: #4facfe; font-size: 0.9em;">
+                        ⚡ Se muestran los primeros 1000 resultados para optimizar el rendimiento
+                    </div>
+                `;
+            }
+
+            return scrollContent;
+        }
+
+        // Generar combinaciones con repetición
+        function getCombinationsWithRepetition(arr, r) {
+            const result = [];
+            const maxResults = 1000; // Límite inteligente
+            
+            function backtrack(start, path) {
+                if (path.length === r) {
+                    result.push([...path]);
+                    return;
+                }
+                
+                if (result.length >= maxResults) return; // Prevenir overflow
+                
+                for (let i = start; i < arr.length; i++) {
+                    path.push(arr[i]);
+                    backtrack(i, path); // i en lugar de i+1 para permitir repetición
+                    path.pop();
+                }
+            }
+            
+            backtrack(0, []);
+            return result;
         }
 
         // Función principal de cálculo con feedback táctil
@@ -606,13 +883,7 @@
                             <p>3. V(${n},${r}) = ${factorial(n)} / ${factorial(n-r)} = ${result}</p>`;
                     
                     const varVisual = generateVisualElements(n, r, 'variaciones', elementType);
-                    visual += `<h3>🎯 Algunas variaciones posibles (orden importa):</h3>
-                              <div class="element-container">
-                                  ${varVisual.combinations.map(combo => 
-                                      `<span class="element selected-element">${combo.join('')}</span>`
-                                  ).join('')}
-                              </div>
-                              <p><em>Total: ${result.toLocaleString()} variaciones diferentes</em></p>`;
+                    visual += createResultsScroll(varVisual.combinations, '🎯 Todas las variaciones posibles (orden importa):', result);
                     break;
 
                 case 'variacionesRep':
@@ -625,13 +896,7 @@
                             <p>3. VR(${n},${r}) = ${n}^${r} = ${result}</p>`;
                     
                     const varRepVisual = generateVisualElements(n, r, 'variacionesRep', elementType);
-                    visual += `<h3>🎯 Algunas variaciones con repetición:</h3>
-                              <div class="element-container">
-                                  ${varRepVisual.combinations.map(combo => 
-                                      `<span class="element selected-element">${combo.join('')}</span>`
-                                  ).join('')}
-                              </div>
-                              <p><em>Total: ${result.toLocaleString()} variaciones con repetición</em></p>`;
+                    visual += createResultsScroll(varRepVisual.combinations, '🎯 Variaciones con repetición:', result);
                     break;
 
                 case 'permutaciones':
@@ -642,12 +907,15 @@
                             <p>1. Calculamos ${n}! = ${n} × ${n-1} × ... × 2 × 1</p>
                             <p>2. P(${n}) = ${result.toLocaleString()}</p>`;
                     
-                    visual += `<h3>🔄 Permutaciones de todos los elementos:</h3>
-                              <p>Todas las formas posibles de ordenar los ${n} elementos</p>
+                    // Para permutaciones, generar todas las permutaciones de n elementos
+                    const permElements = elementSets[elementType].slice(0, n);
+                    const allPermutations = getPermutations(permElements, n);
+                    
+                    visual += `<h3>🔄 Elementos disponibles:</h3>
                               <div class="element-container">
-                                  ${elements.map(el => `<span class="element selected-element">${el}</span>`).join('')}
-                              </div>
-                              <p><em>Total: ${result.toLocaleString()} permutaciones diferentes</em></p>`;
+                                  ${permElements.map(el => `<span class="element">${el}</span>`).join('')}
+                              </div>`;
+                    visual += createResultsScroll(allPermutations, '🔄 Todas las permutaciones posibles:', result);
                     break;
 
                 case 'permutacionesCirc':
@@ -658,14 +926,18 @@
                             <p>1. En permutaciones circulares, fijamos un elemento</p>
                             <p>2. Calculamos (${n}-1)! = ${n-1}! = ${result.toLocaleString()}</p>`;
                     
-                    visual += `<h3>🔄 Permutaciones circulares:</h3>
-                              <p>Organizando elementos en círculo (una posición es fija)</p>
+                    // Para permutaciones circulares, fijamos el primer elemento y permutamos el resto
+                    const circElements = elementSets[elementType].slice(0, n);
+                    const fixedElement = circElements[0];
+                    const remainingElements = circElements.slice(1);
+                    const circPermutations = getPermutations(remainingElements, n-1).map(perm => [fixedElement, ...perm]);
+                    
+                    visual += `<h3>🔄 Elementos disponibles (${fixedElement} fijo):</h3>
                               <div class="element-container">
-                                  ${elements.map((el, i) => 
-                                      `<span class="element ${i === 0 ? 'selected-element' : ''}">${el}</span>`
-                                  ).join('')}
-                              </div>
-                              <p><em>Total: ${result.toLocaleString()} permutaciones circulares</em></p>`;
+                                  <span class="element selected-element">${fixedElement}</span>
+                                  ${remainingElements.map(el => `<span class="element">${el}</span>`).join('')}
+                              </div>`;
+                    visual += createResultsScroll(circPermutations, '🔄 Todas las permutaciones circulares:', result);
                     break;
 
                 case 'combinaciones':
@@ -679,13 +951,7 @@
                             <p>4. C(${n},${r}) = ${factorial(n).toLocaleString()} / (${factorial(r).toLocaleString()} × ${factorial(n-r).toLocaleString()}) = ${result.toLocaleString()}</p>`;
                     
                     const combVisual = generateVisualElements(n, r, 'combinaciones', elementType);
-                    visual += `<h3>🎯 Algunas combinaciones posibles (orden NO importa):</h3>
-                              <div class="element-container">
-                                  ${combVisual.combinations.map(combo => 
-                                      `<span class="element selected-element">${combo.join('')}</span>`
-                                  ).join('')}
-                              </div>
-                              <p><em>Total: ${result.toLocaleString()} combinaciones diferentes</em></p>`;
+                    visual += createResultsScroll(combVisual.combinations, '🎯 Todas las combinaciones posibles (orden NO importa):', result);
                     break;
 
                 case 'combinacionesRep':
@@ -698,12 +964,15 @@
                             <p>3. Calculamos (n-1)! = (${n}-1)! = ${factorial(n-1).toLocaleString()}</p>
                             <p>4. CR(${n},${r}) = ${factorial(n+r-1).toLocaleString()} / (${factorial(r).toLocaleString()} × ${factorial(n-1).toLocaleString()}) = ${result.toLocaleString()}</p>`;
                     
-                    visual += `<h3>🎯 Combinaciones con repetición:</h3>
-                              <p>Seleccionando ${r} elementos de ${n} tipos, con repetición permitida</p>
+                    // Para combinaciones con repetición, necesitamos un enfoque diferente
+                    const combRepElements = elementSets[elementType].slice(0, n);
+                    const combRepCombinations = getCombinationsWithRepetition(combRepElements, r);
+                    
+                    visual += `<h3>🎯 Elementos disponibles (repetición permitida):</h3>
                               <div class="element-container">
-                                  ${elements.map(el => `<span class="element selected-element">${el}</span>`).join('')}
-                              </div>
-                              <p><em>Total: ${result.toLocaleString()} combinaciones con repetición</em></p>`;
+                                  ${combRepElements.map(el => `<span class="element">${el}</span>`).join('')}
+                              </div>`;
+                    visual += createResultsScroll(combRepCombinations, '🎯 Combinaciones con repetición:', result);
                     break;
             }
 
@@ -766,25 +1035,21 @@
                 this.style.transform = 'scale(1)';
             }, { passive: true });
 
-            // Prevenir zoom en inputs en iOS
-            const inputs = document.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.fontSize = '16px';
-                });
+            // Mejorar scroll en contenedores de resultados
+            const scrollContainers = document.querySelectorAll('.results-scroll-container');
+            scrollContainers.forEach(container => {
+                container.style.webkitOverflowScrolling = 'touch';
+                container.style.overflowScrolling = 'touch';
             });
         }
 
         // Detectar orientación y ajustar layout
         function handleOrientationChange() {
-            const container = document.querySelector('.container');
-            
-            if (window.orientation !== undefined) {
-                // Reajustar después del cambio de orientación
-                setTimeout(() => {
-                    window.scrollTo(0, 0);
-                }, 500);
-            }
+            // Reajustar después del cambio de orientación
+            setTimeout(() => {
+                // Permitir scroll natural sin restricciones
+                window.scrollTo({ top: window.scrollY, behavior: 'smooth' });
+            }, 500);
         }
 
         // Optimización de rendimiento para móviles
@@ -793,6 +1058,9 @@
             if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
                 const style = document.createElement('style');
                 style.textContent = `
+                    .combination-row {
+                        animation: none !important;
+                    }
                     * {
                         animation-duration: 0.2s !important;
                         transition-duration: 0.2s !important;
@@ -814,13 +1082,9 @@
             window.addEventListener('orientationchange', handleOrientationChange);
             window.addEventListener('resize', handleOrientationChange);
             
-            // Precargar elementos para mejor rendimiento
-            const elementTypes = Object.keys(elementSets);
-            elementTypes.forEach(type => {
-                elementSets[type].forEach(element => {
-                    // Precargar emojis y elementos
-                });
-            });
+            // Permitir zoom y scroll fluido
+            document.body.style.touchAction = 'manipulation';
+            document.documentElement.style.touchAction = 'manipulation';
         }
 
         // Animación inicial optimizada
@@ -836,30 +1100,14 @@
             }, 100);
         });
 
-        // Service Worker para mejor rendimiento (opcional)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                // Registrar service worker para cache si está disponible
-            });
-        }
-
-        // Prevenir bounce en iOS
-        document.addEventListener('touchmove', function(e) {
-            if (e.target.closest('.container')) {
-                // Permitir scroll dentro del container
-                return;
-            }
-            e.preventDefault();
-        }, { passive: false });
-
-        // Mejorar accesibilidad en móviles
+        // Mejorar accesibilidad y navegación
         document.addEventListener('DOMContentLoaded', function() {
             // Agregar roles ARIA para mejor accesibilidad
             const calculateBtn = document.querySelector('.calculate-btn');
             calculateBtn.setAttribute('role', 'button');
             calculateBtn.setAttribute('aria-label', 'Calcular resultado de combinatoria');
             
-            // Mejorar navegación por teclado en móviles
+            // Mejorar navegación por teclado
             const inputs = document.querySelectorAll('input, select');
             inputs.forEach((input, index) => {
                 input.addEventListener('keydown', function(e) {
@@ -870,6 +1118,9 @@
                     }
                 });
             });
+
+            // Permitir scroll suave en toda la página
+            document.documentElement.style.scrollBehavior = 'smooth';
         });
     </script>
 </body>
