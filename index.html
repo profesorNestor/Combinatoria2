@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f0c29">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Combinatoria Interactiva</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 35%, #24243e 100%);
+            min-height: 100vh;
+            padding: 10px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            text-align: center;
+            padding: clamp(20px, 5vw, 40px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            opacity: 0.95;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            padding: clamp(15px, 4vw, 35px);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .control-group {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 16px;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .control-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 1.1em;
+            letter-spacing: 0.02em;
+        }
+
+        .control-group select,
+        .control-group input {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d3748;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .element-type-selector {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .element-type-selector:hover {
+            box-shadow: 0 12px 24px rgba(79, 172, 254, 0.3);
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            color: white;
+            border: none;
+            padding: 18px 32px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 2px solid transparent;
+            min-height: 60px;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(240, 147, 251, 0.4);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+            transition: transform 0.1s ease;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, rgba(15, 12, 41, 0.8) 0%, rgba(48, 43, 99, 0.8) 100%);
+            border-radius: 20px;
+            padding: clamp(20px, 4vw, 30px);
+            margin-top: 24px;
+            min-height: 200px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .formula-display {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #667eea;
+            color: #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .steps-display {
+            background: rgba(79, 172, 254, 0.15);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #4facfe;
+            color: #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .visual-display {
+            background: rgba(240, 147, 251, 0.15);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+            min-height: 120px;
+            border-left: 4px solid #f093fb;
+            color: #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .element-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .element {
+            display: inline-block;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            animation: fadeIn 0.5s ease-in;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: white;
+            font-weight: 600;
+            min-width: 44px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .element:hover {
+            transform: scale(1.05);
+        }
+
+        .selected-element {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4); }
+            to { box-shadow: 0 8px 20px rgba(240, 147, 251, 0.8); }
+        }
+
+        .result-highlight {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: 800;
+            margin-top: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.02em;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .animated {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 100%);
+            color: #e2e8f0;
+            text-align: center;
+            padding: clamp(20px, 4vw, 35px);
+            margin-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer p {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            margin: 8px 0;
+            font-weight: 500;
+        }
+
+        .footer .author {
+            font-weight: 800;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            color: #4facfe;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            letter-spacing: 0.02em;
+        }
+
+        /* Optimizaciones móviles específicas */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                border-radius: 16px;
+            }
+            
+            .controls-section {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .control-group {
+                padding: 16px;
+            }
+            
+            .element {
+                font-size: 1rem;
+                padding: 8px 12px;
+                min-width: 40px;
+            }
+            
+            .calculate-btn {
+                font-size: 1.1em;
+                padding: 16px 24px;
+                min-height: 56px;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .results-section {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .element-container {
+                gap: 6px;
+            }
+            
+            .element {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+                min-width: 36px;
+            }
+            
+            .control-group select,
+            .control-group input {
+                padding: 14px;
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+        }
+
+        /* Optimizaciones para iOS */
+        @supports (-webkit-touch-callout: none) {
+            .control-group select,
+            .control-group input {
+                -webkit-appearance: none;
+                border-radius: 12px;
+            }
+            
+            .calculate-btn {
+                -webkit-tap-highlight-color: transparent;
+                -webkit-user-select: none;
+            }
+        }
+
+        /* Modo oscuro nativo */
+        @media (prefers-color-scheme: dark) {
+            .control-group select,
+            .control-group input {
+                background: rgba(255, 255, 255, 0.9);
+                color: #1a202c;
+            }
+        }
+
+        /* Animaciones de alta performance */
+        .element,
+        .control-group,
+        .calculate-btn {
+            will-change: transform;
+            transform: translateZ(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 Combinatoria Interactiva 🎲</h1>
+            <p>Aprende variaciones, permutaciones y combinaciones de forma visual</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls-section">
+                <div class="control-group">
+                    <label for="calculationType">📊 Tipo de Cálculo:</label>
+                    <select id="calculationType">
+                        <option value="variaciones">Variaciones V(n,r)</option>
+                        <option value="variacionesRep">Variaciones con Repetición VR(n,r)</option>
+                        <option value="permutaciones">Permutaciones P(n)</option>
+                        <option value="permutacionesCirc">Permutaciones Circulares PC(n)</option>
+                        <option value="combinaciones">Combinaciones C(n,r)</option>
+                        <option value="combinacionesRep">Combinaciones con Repetición CR(n,r)</option>
+                    </select>
+                </div>
+
+                <div class="control-group element-type-selector">
+                    <label for="elementType">🎨 Tipo de Elementos:</label>
+                    <select id="elementType">
+                        <option value="emojis">😀 Emojis</option>
+                        <option value="numbers">🔢 Números</option>
+                        <option value="letters">🔤 Letras</option>
+                        <option value="cards">🃏 Cartas</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="nValue">📝 Número total de elementos (n):</label>
+                    <input type="number" id="nValue" min="1" max="10" value="5">
+                </div>
+
+                <div class="control-group" id="rValueGroup">
+                    <label for="rValue">🎯 Elementos a tomar (r):</label>
+                    <input type="number" id="rValue" min="1" max="10" value="3">
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculate()">🚀 ¡Calcular!</button>
+
+            <div class="results-section" id="results" style="display: none;">
+                <div class="formula-display" id="formula"></div>
+                <div class="steps-display" id="steps"></div>
+                <div class="visual-display" id="visual"></div>
+                <div class="result-highlight" id="finalResult"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎓 Matemáticas Aplicadas</p>
+            <p class="author">Autor: MSc Néstor Fabio Montoya Palacios</p>
+            <p>📚 Educación Interactiva • 🌟 Aprendizaje Visual</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de elementos
+        const elementSets = {
+            emojis: ['😀', '🎈', '🌟', '🎁', '🌺', '🎯', '🎨', '🎭', '🎪', '🎸'],
+            numbers: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+            letters: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+            cards: ['♠️', '♥️', '♦️', '♣️', '🃏', '🎴', '🂡', '🂱', '🃁', '🃑']
+        };
+
+        // Función para calcular factorial
+        function factorial(n) {
+            if (n <= 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        // Función para generar combinaciones/permutaciones visualmente
+        function generateVisualElements(n, r, type, elementType) {
+            const elements = elementSets[elementType].slice(0, n);
+            let combinations = [];
+            
+            if (type === 'combinaciones') {
+                combinations = getCombinations(elements, r);
+            } else if (type === 'permutaciones' || type === 'variaciones') {
+                combinations = getPermutations(elements, r);
+            } else if (type === 'variacionesRep') {
+                combinations = getVariationsWithRepetition(elements, r);
+            }
+            
+            return { elements, combinations };
+        }
+
+        // Generar combinaciones
+        function getCombinations(arr, r) {
+            const result = [];
+            
+            function backtrack(start, path) {
+                if (path.length === r) {
+                    result.push([...path]);
+                    return;
+                }
+                
+                for (let i = start; i < arr.length; i++) {
+                    path.push(arr[i]);
+                    backtrack(i + 1, path);
+                    path.pop();
+                }
+            }
+            
+            backtrack(0, []);
+            return result.slice(0, 20); // Limitar para visualización
+        }
+
+        // Generar permutaciones
+        function getPermutations(arr, r) {
+            const result = [];
+            
+            function backtrack(path, used) {
+                if (path.length === r) {
+                    result.push([...path]);
+                    return;
+                }
+                
+                for (let i = 0; i < arr.length; i++) {
+                    if (used[i]) continue;
+                    
+                    path.push(arr[i]);
+                    used[i] = true;
+                    backtrack(path, used);
+                    path.pop();
+                    used[i] = false;
+                }
+            }
+            
+            backtrack([], new Array(arr.length).fill(false));
+            return result.slice(0, 20); // Limitar para visualización
+        }
+
+        // Generar variaciones con repetición
+        function getVariationsWithRepetition(arr, r) {
+            const result = [];
+            
+            function backtrack(path) {
+                if (path.length === r) {
+                    result.push([...path]);
+                    return;
+                }
+                
+                for (let i = 0; i < arr.length; i++) {
+                    path.push(arr[i]);
+                    backtrack(path);
+                    path.pop();
+                }
+            }
+            
+            backtrack([]);
+            return result.slice(0, 20); // Limitar para visualización
+        }
+
+        // Función principal de cálculo con feedback táctil
+        function calculate() {
+            // Vibración táctil en dispositivos móviles
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+
+            const type = document.getElementById('calculationType').value;
+            const elementType = document.getElementById('elementType').value;
+            const n = parseInt(document.getElementById('nValue').value);
+            const r = parseInt(document.getElementById('rValue').value);
+
+            if (!n || n < 1) {
+                showMobileAlert('Por favor ingresa un valor válido para n');
+                return;
+            }
+
+            if ((type !== 'permutaciones' && type !== 'permutacionesCirc') && (!r || r < 1 || r > n)) {
+                showMobileAlert('Por favor ingresa un valor válido para r (r debe ser ≤ n)');
+                return;
+            }
+
+            let formula = '';
+            let steps = '';
+            let result = 0;
+            let visual = '';
+
+            // Mostrar elementos disponibles
+            const elements = elementSets[elementType].slice(0, n);
+            visual = `<h3>🎲 Elementos disponibles:</h3>
+                      <div class="element-container">
+                          ${elements.map(el => `<span class="element">${el}</span>`).join('')}
+                      </div>`;
+
+            switch (type) {
+                case 'variaciones':
+                    result = factorial(n) / factorial(n - r);
+                    formula = `<h3>📋 Fórmula: V(n,r) = n! / (n-r)!</h3>
+                              <p><strong>V(${n},${r}) = ${n}! / (${n}-${r})!</strong></p>`;
+                    steps = `<h3>🔢 Pasos del cálculo:</h3>
+                            <p>1. Calculamos ${n}! = ${factorial(n)}</p>
+                            <p>2. Calculamos (${n}-${r})! = ${n-r}! = ${factorial(n-r)}</p>
+                            <p>3. V(${n},${r}) = ${factorial(n)} / ${factorial(n-r)} = ${result}</p>`;
+                    
+                    const varVisual = generateVisualElements(n, r, 'variaciones', elementType);
+                    visual += `<h3>🎯 Algunas variaciones posibles (orden importa):</h3>
+                              <div class="element-container">
+                                  ${varVisual.combinations.map(combo => 
+                                      `<span class="element selected-element">${combo.join('')}</span>`
+                                  ).join('')}
+                              </div>
+                              <p><em>Total: ${result.toLocaleString()} variaciones diferentes</em></p>`;
+                    break;
+
+                case 'variacionesRep':
+                    result = Math.pow(n, r);
+                    formula = `<h3>📋 Fórmula: VR(n,r) = n^r</h3>
+                              <p><strong>VR(${n},${r}) = ${n}^${r}</strong></p>`;
+                    steps = `<h3>🔢 Pasos del cálculo:</h3>
+                            <p>1. Tenemos ${n} elementos disponibles</p>
+                            <p>2. Tomamos ${r} elementos con repetición permitida</p>
+                            <p>3. VR(${n},${r}) = ${n}^${r} = ${result}</p>`;
+                    
+                    const varRepVisual = generateVisualElements(n, r, 'variacionesRep', elementType);
+                    visual += `<h3>🎯 Algunas variaciones con repetición:</h3>
+                              <div class="element-container">
+                                  ${varRepVisual.combinations.map(combo => 
+                                      `<span class="element selected-element">${combo.join('')}</span>`
+                                  ).join('')}
+                              </div>
+                              <p><em>Total: ${result.toLocaleString()} variaciones con repetición</em></p>`;
+                    break;
+
+                case 'permutaciones':
+                    result = factorial(n);
+                    formula = `<h3>📋 Fórmula: P(n) = n!</h3>
+                              <p><strong>P(${n}) = ${n}!</strong></p>`;
+                    steps = `<h3>🔢 Pasos del cálculo:</h3>
+                            <p>1. Calculamos ${n}! = ${n} × ${n-1} × ... × 2 × 1</p>
+                            <p>2. P(${n}) = ${result.toLocaleString()}</p>`;
+                    
+                    visual += `<h3>🔄 Permutaciones de todos los elementos:</h3>
+                              <p>Todas las formas posibles de ordenar los ${n} elementos</p>
+                              <div class="element-container">
+                                  ${elements.map(el => `<span class="element selected-element">${el}</span>`).join('')}
+                              </div>
+                              <p><em>Total: ${result.toLocaleString()} permutaciones diferentes</em></p>`;
+                    break;
+
+                case 'permutacionesCirc':
+                    result = factorial(n - 1);
+                    formula = `<h3>📋 Fórmula: PC(n) = (n-1)!</h3>
+                              <p><strong>PC(${n}) = (${n}-1)!</strong></p>`;
+                    steps = `<h3>🔢 Pasos del cálculo:</h3>
+                            <p>1. En permutaciones circulares, fijamos un elemento</p>
+                            <p>2. Calculamos (${n}-1)! = ${n-1}! = ${result.toLocaleString()}</p>`;
+                    
+                    visual += `<h3>🔄 Permutaciones circulares:</h3>
+                              <p>Organizando elementos en círculo (una posición es fija)</p>
+                              <div class="element-container">
+                                  ${elements.map((el, i) => 
+                                      `<span class="element ${i === 0 ? 'selected-element' : ''}">${el}</span>`
+                                  ).join('')}
+                              </div>
+                              <p><em>Total: ${result.toLocaleString()} permutaciones circulares</em></p>`;
+                    break;
+
+                case 'combinaciones':
+                    result = factorial(n) / (factorial(r) * factorial(n - r));
+                    formula = `<h3>📋 Fórmula: C(n,r) = n! / (r!(n-r)!)</h3>
+                              <p><strong>C(${n},${r}) = ${n}! / (${r}!(${n}-${r})!)</strong></p>`;
+                    steps = `<h3>🔢 Pasos del cálculo:</h3>
+                            <p>1. Calculamos ${n}! = ${factorial(n).toLocaleString()}</p>
+                            <p>2. Calculamos ${r}! = ${factorial(r).toLocaleString()}</p>
+                            <p>3. Calculamos (${n}-${r})! = ${factorial(n-r).toLocaleString()}</p>
+                            <p>4. C(${n},${r}) = ${factorial(n).toLocaleString()} / (${factorial(r).toLocaleString()} × ${factorial(n-r).toLocaleString()}) = ${result.toLocaleString()}</p>`;
+                    
+                    const combVisual = generateVisualElements(n, r, 'combinaciones', elementType);
+                    visual += `<h3>🎯 Algunas combinaciones posibles (orden NO importa):</h3>
+                              <div class="element-container">
+                                  ${combVisual.combinations.map(combo => 
+                                      `<span class="element selected-element">${combo.join('')}</span>`
+                                  ).join('')}
+                              </div>
+                              <p><em>Total: ${result.toLocaleString()} combinaciones diferentes</em></p>`;
+                    break;
+
+                case 'combinacionesRep':
+                    result = factorial(n + r - 1) / (factorial(r) * factorial(n - 1));
+                    formula = `<h3>📋 Fórmula: CR(n,r) = C(n+r-1,r)</h3>
+                              <p><strong>CR(${n},${r}) = C(${n+r-1},${r}) = (${n+r-1})! / (${r}!(${n-1})!)</strong></p>`;
+                    steps = `<h3>🔢 Pasos del cálculo:</h3>
+                            <p>1. Calculamos (n+r-1)! = (${n}+${r}-1)! = ${n+r-1}! = ${factorial(n+r-1).toLocaleString()}</p>
+                            <p>2. Calculamos r! = ${r}! = ${factorial(r).toLocaleString()}</p>
+                            <p>3. Calculamos (n-1)! = (${n}-1)! = ${factorial(n-1).toLocaleString()}</p>
+                            <p>4. CR(${n},${r}) = ${factorial(n+r-1).toLocaleString()} / (${factorial(r).toLocaleString()} × ${factorial(n-1).toLocaleString()}) = ${result.toLocaleString()}</p>`;
+                    
+                    visual += `<h3>🎯 Combinaciones con repetición:</h3>
+                              <p>Seleccionando ${r} elementos de ${n} tipos, con repetición permitida</p>
+                              <div class="element-container">
+                                  ${elements.map(el => `<span class="element selected-element">${el}</span>`).join('')}
+                              </div>
+                              <p><em>Total: ${result.toLocaleString()} combinaciones con repetición</em></p>`;
+                    break;
+            }
+
+            // Mostrar resultados con animación
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('formula').innerHTML = formula;
+            document.getElementById('steps').innerHTML = steps;
+            document.getElementById('visual').innerHTML = visual;
+            document.getElementById('finalResult').innerHTML = `🎉 Resultado Final: ${result.toLocaleString()}`;
+
+            // Añadir animación
+            document.getElementById('results').classList.add('animated');
+            setTimeout(() => {
+                document.getElementById('results').classList.remove('animated');
+            }, 600);
+
+            // Scroll suave hacia los resultados con offset para móviles
+            setTimeout(() => {
+                const resultsElement = document.getElementById('results');
+                const offset = window.innerHeight < 768 ? 20 : 0;
+                const elementPosition = resultsElement.offsetTop - offset;
+                
+                window.scrollTo({
+                    top: elementPosition,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        // Función de alerta optimizada para móviles
+        function showMobileAlert(message) {
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            alert(message);
+        }
+
+        // Evento para mostrar/ocultar campo r según el tipo de cálculo
+        document.getElementById('calculationType').addEventListener('change', function() {
+            const rGroup = document.getElementById('rValueGroup');
+            const type = this.value;
+            
+            if (type === 'permutaciones' || type === 'permutacionesCirc') {
+                rGroup.style.display = 'none';
+            } else {
+                rGroup.style.display = 'block';
+            }
+        });
+
+        // Optimizaciones para dispositivos táctiles
+        function addTouchSupport() {
+            const calculateBtn = document.querySelector('.calculate-btn');
+            
+            // Feedback visual mejorado para touch
+            calculateBtn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            }, { passive: true });
+            
+            calculateBtn.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            }, { passive: true });
+
+            // Prevenir zoom en inputs en iOS
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.fontSize = '16px';
+                });
+            });
+        }
+
+        // Detectar orientación y ajustar layout
+        function handleOrientationChange() {
+            const container = document.querySelector('.container');
+            
+            if (window.orientation !== undefined) {
+                // Reajustar después del cambio de orientación
+                setTimeout(() => {
+                    window.scrollTo(0, 0);
+                }, 500);
+            }
+        }
+
+        // Optimización de rendimiento para móviles
+        function optimizePerformance() {
+            // Reducir animaciones en dispositivos de bajo rendimiento
+            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+                const style = document.createElement('style');
+                style.textContent = `
+                    * {
+                        animation-duration: 0.2s !important;
+                        transition-duration: 0.2s !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Inicialización mejorada
+        function initializeApp() {
+            // Configurar eventos táctiles
+            addTouchSupport();
+            
+            // Optimizar rendimiento
+            optimizePerformance();
+            
+            // Manejar cambios de orientación
+            window.addEventListener('orientationchange', handleOrientationChange);
+            window.addEventListener('resize', handleOrientationChange);
+            
+            // Precargar elementos para mejor rendimiento
+            const elementTypes = Object.keys(elementSets);
+            elementTypes.forEach(type => {
+                elementSets[type].forEach(element => {
+                    // Precargar emojis y elementos
+                });
+            });
+        }
+
+        // Animación inicial optimizada
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-in';
+            
+            // Inicializar la aplicación
+            initializeApp();
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Service Worker para mejor rendimiento (opcional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // Registrar service worker para cache si está disponible
+            });
+        }
+
+        // Prevenir bounce en iOS
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.container')) {
+                // Permitir scroll dentro del container
+                return;
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        // Mejorar accesibilidad en móviles
+        document.addEventListener('DOMContentLoaded', function() {
+            // Agregar roles ARIA para mejor accesibilidad
+            const calculateBtn = document.querySelector('.calculate-btn');
+            calculateBtn.setAttribute('role', 'button');
+            calculateBtn.setAttribute('aria-label', 'Calcular resultado de combinatoria');
+            
+            // Mejorar navegación por teclado en móviles
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach((input, index) => {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    } else if (e.key === 'Enter' && index === inputs.length - 1) {
+                        calculate();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
